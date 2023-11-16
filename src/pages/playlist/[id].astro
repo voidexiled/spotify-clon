@@ -1,0 +1,136 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import TimeIcon from "../../icons/Time.astro";
+import PlayIcon from "../../icons/Play.astro";
+import { SongPlayButton } from "../../components/SongPlayButton.jsx";
+import { allPlaylists, songs } from "../../lib/data";
+import { CardPlayButton } from "@/components/CardPlayButton";
+const { id } = Astro.params;
+const playlist = allPlaylists.find((playlist) => playlist.id === id);
+const playListSongs = songs.filter(
+  (song) => song.albumId === playlist?.albumId
+);
+
+const artistsString = playlist?.artists.join(", ");
+const startColor = playlist?.color.accent;
+const endColor = playlist?.color.dark;
+const coverSrc = playlist?.cover;
+const src = `--cover: url(${coverSrc})`;
+const style = `--startColor: ${startColor}; --endColor: ${endColor}`;
+---
+
+<Layout title="Spotify Clone" transition:name=`box ${id} of ${artistsString}`>
+  <div
+    id="playlist-container"
+    style={src}
+    class="relative transition-all duration-1000 h-full w-full"
+  >
+    <div class="absolute w-full h-full top-0 left-0 backgroundCoverImgBySrc">
+    </div>
+    <div
+      class="absolute w-full h-full top-0 left-0 backgroundBySong"
+      style={style}
+    >
+    </div>
+    <!--Page header -->
+    <div class="relative flex-col flex-1 flex">
+      <!-- TOP NAV BAR -->
+      <nav
+        id="mainNavBar"
+        class="fixed z-10 px-6 flex w-full justify-between min-h-[45px]"
+      >
+        <div class="flex gap-4 items-center">
+          <a
+            href="/"
+            class="font-bold text-light-strong rounded-lg bg-slate-50/20 w-4 h-4 items-center flex justify-center"
+            >{"<"}</a
+          >
+          <span
+            class="text-light-weak rounded-lg bg-slate-50/5 w-4 h-4 items-center flex justify-center"
+            >{">"}</span
+          >
+        </div>
+        <div class="flex gap-3 items-center">
+          <TimeIcon />
+          <TimeIcon />
+          <TimeIcon />
+        </div>
+      </nav>
+
+      <header class="flex flex-row flex-1 px-6 pt-24 pb-5" style=`${style}`>
+        <div
+          class="relative w-44 h-44 overflow-hidden shadow-black/30 shadow-md"
+        >
+          <picture class="aspect-square w-full h-auto flex-none">
+            <img
+              transition:name=`cover ${id} of ${artistsString}`
+              src={playlist?.cover}
+              alt={`Cover of ${playlist?.title} by ${artistsString}`}
+              class="object-cover w-full h-full rounded-sm transition-all"
+            />
+          </picture>
+        </div>
+        <div class="flex flex-col px-6 justify-between">
+          <h3 class="text-lg pt-8 text-light-strong/80">Playlist</h3>
+          <h1 class="text-5xl font-semibold">{playlist?.title}</h1>
+          <div class="flex flex-col justify-between">
+            <h2 class="font-thin">{artistsString}</h2>
+            <span class="text-light-strong/90 font-normal"
+              >58 likes<span class="font-light">, 83 musics</span><span
+                class="text-light-strong/70 font-extralight"
+                >, about 3h 15min</span
+              ></span
+            >
+          </div>
+        </div>
+      </header>
+      <section class="flex flex-col w-full px-6 bg-dark-strong/40 py-8">
+        <header class="grid grid-cols-4 min-h-[35px] px-4">
+          <span>#</span>
+          <span>Title</span>
+          <span>Album</span>
+          <span><TimeIcon /></span>
+        </header>
+        <div class="w-full h-[1px] bg-gray-300/70 px-4"></div>
+        <body class="flex flex-col">
+          {
+            songs.map((song, index) => (
+              <div class="px-4 song grid grid-cols-4 min-h-[45px] items-center hover:bg-white/20 m-0 group">
+                <span class="group-hover:hidden pl-1 transition-alll">
+                  {index + 1}
+                </span>
+
+                <div class="hidden group-hover:flex w-fit transition-all">
+                  <SongPlayButton client:load song={song} />
+                </div>
+
+                <span>{song.title}</span>
+                <span>{song.album}</span>
+                <span>{song.duration}</span>
+              </div>
+            ))
+          }
+        </body>
+      </section>
+    </div>
+  </div>
+</Layout>
+<style>
+  .backgroundCoverImgBySrc {
+    filter: blur(16px);
+    opacity: 0.4;
+    background-image: var(--cover);
+    background-size: 200%;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .backgroundBySong {
+    opacity: 0.7;
+    background: linear-gradient(
+      180deg,
+      var(--endColor) 0%,
+      var(--startColor) 30%,
+      transparent 90%
+    );
+  }
+</style>

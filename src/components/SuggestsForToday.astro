@@ -1,0 +1,17 @@
+---
+import { playlists } from "@/lib/data";
+import Card from "./Card.astro";
+---
+
+<section class="flex flex-col">
+  <div class="flex flex-1 justify-between pb-2">
+    <h4 class="text-lg">Creado para Jalomo</h4>
+    <span class="text-xs text-light-weak cursor-pointer hover:underline"
+      >Mostrar todo</span
+    >
+  </div>
+  <!-- Show only 3 playlists -->
+  <div class="flex gap-4">
+    {playlists.map((playlist) => <Card playlist={playlist} />)}
+  </div>
+</section>
